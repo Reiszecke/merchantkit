@@ -1,3 +1,5 @@
+#if !os(watchOS)
+
 import SystemConfiguration
 
 /// Observe notifications to network availability.
@@ -109,3 +111,5 @@ extension NetworkAvailabilityCenter {
         return flags.contains(.reachable) && !flags.contains(.connectionRequired)
     }
 }
+
+#endif

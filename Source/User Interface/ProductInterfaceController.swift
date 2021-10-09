@@ -51,9 +51,9 @@ public final class ProductInterfaceController {
     private var availablePurchasesFetchResult: FetchResult?
     
     private var stateForProductIdentifier = [String : ProductState]()
-    
+#if !os(watchOS)
     private let networkAvailabilityCenter = NetworkAvailabilityCenter()
-    
+#endif
     public init(products: Set<Product>, with merchant: Merchant) {
         self.products = products
         self.merchant = merchant
@@ -61,10 +61,11 @@ public final class ProductInterfaceController {
         for product in products {
             self.stateForProductIdentifier[product.identifier] = self._determineCurrentState(for: product)
         }
-        
+#if !os(watchOS)
         self.networkAvailabilityCenter.onConnectivityChanged = { [weak self] in
             self?.didChangeNetworkConnectivity()
         }
+#endif
     }
     
     public func state(for product: Product) -> ProductState {
@@ -379,14 +380,17 @@ extension ProductInterfaceController {
     }
     
     private func updateNetworkAvailabilityCenterState() {
+#if !os(watchOS)
         if self.automaticallyRefetchIfNetworkAvailabilityChanges {
             self.networkAvailabilityCenter.observeChanges()
         } else {
             self.networkAvailabilityCenter.stopObservingChanges()
         }
+#endif
     }
     
     private func didChangeNetworkConnectivity() {
+#if !os(watchOS)
         guard self.networkAvailabilityCenter.isConnectedToNetwork else { return }
         
         if case .failed(.networkFailure(_))? = self.availablePurchasesFetchResult {
@@ -394,5 +398,6 @@ extension ProductInterfaceController {
                 self.refetchAvailablePurchases(silentlyFetch: true)
             }
         }
+#endif
     }
 }
